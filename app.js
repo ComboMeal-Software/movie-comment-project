@@ -44,4 +44,6 @@ require('./functions/add_movie')(app, Movie);
 require('./functions/get_all_movies')(app, Movie);
 require('./functions/get_movie')(app, Movie);
 
-app.listen(2022, () => console.log("Listening on 2022"));
+const port = 8081;
+
+app.listen(port, () => console.log("Listening on " + port));
