@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>todo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;1,300&display=swap"
+          rel="stylesheet">
+</head>
+<body>
+<div class="todo-app">
+    <header class="todo-app__header">
+        <h1 class="title">todos</h1>
+    </header>
+    <main class="todo-app__frame">
+        <div class="todo-app__main-controls main-controls">
+            <!--suppress HtmlFormInputWithoutLabel -->
+            <input class="main-controls__task-text" type="text" id="task-text" name="taskText"
+                   placeholder="What needs to be done?">
+            <input class="main-controls__submit" type="button" id="submit-btn" name="switch">
+        </div>
+        <div class="todo-app__tasks">
+            <ul class="todo-app__task-list tasks" id="task-list">
+                <!-- Placeholder for demonstration without the backend running --->
+                <li class="task-item">
+                    <input class="task-item__status-input" type="checkbox" id="placeholder" name="task1" value="PLACEHOLDER">
+                    <label class="task-item__status-icon" for="placeholder"></label>
+                    <label class="task-item__text" for="placeholder">Placeholder</label>
+                </li>
+            </ul>
+        </div>
+    </main>
+</div>
+<script src="js/index.js"></script>
+</body>
+</html>
