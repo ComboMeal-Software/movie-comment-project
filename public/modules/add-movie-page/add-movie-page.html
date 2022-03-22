@@ -1,0 +1,35 @@
+<div ng-controller="AddMoviePageCtrl">
+    <form name="movieForm" ng-submit="submitForm()" class="row">
+        <label class="form-label col-12 mb-3">
+            Title
+            <input type="text"
+                   class="form-control"
+                   ng-model="movie.title"
+                   required>
+        </label>
+
+        <label class="form-label col-3 mb-3">
+            IMDB ID
+            <input type="text"
+                   class="form-control"
+                   ng-model="movie.imdbId"
+                   required>
+        </label>
+
+        <label class="form-label col-3 mb-3">
+            Director
+            <input type="text"
+                   class="form-control"
+                   ng-model="movie.director"
+                   required>
+        </label>
+
+        <div class="offset-10 col-2">
+            <button ng-disabled="movieForm.$invalid"
+                    type="submit"
+                    class="btn btn-primary w-100">
+                Add
+            </button>
+        </div>
+    </form>
+</div>

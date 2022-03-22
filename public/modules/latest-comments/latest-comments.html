@@ -1,0 +1,21 @@
+<div ng-controller="LatestCommentsCtrl" class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white">
+    <span class="py-3 fs-5 fw-semibold">3 latest comments:</span>
+
+    <div ng-show="showLoader" class="pv-3">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div ng-show="showLoadError" class="pv-3">
+        Error occurred! Please, try to reopen this page.
+    </div>
+
+    <div class="list-group">
+        <div ng-repeat="comment in commentsData" class="list-group-item py-3">
+            <div class="d-flex align-items-center justify-content-between"><strong class="mb-1">{{ comment.movieTitle || 'Unknown movie'}}</strong>
+                <small class="text-muted">{{ comment.rating }} stars</small></div>
+            <div class="col-10 mb-1 small">{{ comment.comment }}</div>
+            <small class="text-muted"> (by {{ comment.author }})</small></div>
+    </div>
+</div>
