@@ -4,87 +4,62 @@ angular.module('app.moviePage', []).directive('appMoviePage', [function () {
     return {
         templateUrl: 'modules/movie-page/movie-page.html'
     };
-}]).controller('MoviePageCtrl', ['$scope', '$http', '$location', '$window',
-    function ($scope, $http, $location, $window) {
-        $scope.baseUrl = new $window.URL($location.absUrl()).origin;
-
-        $scope.mode = 'dvd';
-        $scope.searchText = '';
-
+}]).controller('MoviePageCtrl', ['$scope', '$http', '$routeParams',
+    function ($scope, $http, $routeParams) {
         $scope.showLoader = false;
         $scope.showLoadError = false;
 
-        $scope.dvdData = [];
-        $scope.clientData = null;
+        $scope.showCommentsLoader = false;
+        $scope.showCommentsLoadError = false;
+        $scope.showThankYou = false;
 
-        $scope.loadData = () => {
+        $scope.movieData = null;
+        $scope.commentsData = [];
+        $scope.newComment = { imdbId: $routeParams.id, language: 'ENG' };
+
+        $scope.loadMovieData = () => {
             $scope.showLoader = true;
 
-            if ($scope.mode === 'dvd') {
-                $scope.loadDvds();
-            } else {
-                $scope.loadClient();
-            }
-
-            $scope.showLoader = false;
+            $http({
+                method: 'GET',
+                url: `http://localhost:8081/movie?imdbId=${$routeParams.id}`,
+            }).then(response => {
+                $scope.movieData = response.data[0];
+            }).catch(() => {
+                $scope.showLoadError = true;
+            }).finally(() => {
+                $scope.showLoader = false;
+            });
         }
 
-        $scope.loadDvds = () => {
-            $scope.dvdData = [];
+        $scope.loadCommentsData = () => {
+            $scope.showCommentsLoader = true;
 
             $http({
                 method: 'GET',
-                url: $scope.baseUrl + '/dvd-rental-app/dvd/find',
-                params: {name: $scope.searchText},
+                url: `http://localhost:8081/movie_comments?imdbId=${$routeParams.id}`,
             }).then(response => {
-                $scope.dvdData = response.data;
+                $scope.commentsData = response.data;
             }).catch(() => {
-                $scope.showLoadError = true;
+                $scope.showCommentsLoadError = true;
+            }).finally(() => {
+                $scope.showCommentsLoader = false;
             });
         }
 
-        $scope.loadClient = () => {
-            if (!$scope.searchText) return;
-
-            $scope.clientData = null;
-
-            $http({
-                method: 'GET',
-                url: $scope.baseUrl + '/dvd-rental-app/client/find',
-                params: {telNumber: encodeURI($scope.searchText)},
-            }).then(response => {
-                $scope.clientData = response.data.data;
-            }).catch(() => {
-                $scope.showLoadError = true;
-            });
-        }
-
-        $scope.rentDvd = (dvd) => {
+        $scope.submitForm = () => {
             $http({
                 method: 'POST',
-                url: $scope.baseUrl + '/dvd-rental-app/rent/add',
-                data: {dvdId: dvd.id, clientTelNumber: dvd.rentClient},
+                url: 'http://localhost:8081/add_comment',
+                data: $scope.newComment,
             }).then(() => {
-                $scope.loadData();
+                $scope.loadCommentsData();
+                $scope.showThankYou = true;
             }).catch(() => {
-                alert("Renting error occurred, operation wasn't finished!");
+                alert('Error was occurred!');
             });
-        }
+        };
 
-        $scope.returnDvd = (dvd) => {
-            const {rentId} = dvd;
-            if (!rentId) return;
-
-            $http({
-                method: 'POST',
-                url: $scope.baseUrl + '/dvd-rental-app/rent/return',
-                data: {rentId},
-            }).then(() => {
-                dvd.rentId = null;
-            });
-        }
-
-        $scope.isNull = (el) => !el || el === 'null';
-
-        $scope.loadData();
+        $scope.loadMovieData();
+        $scope.loadCommentsData();
     }]);

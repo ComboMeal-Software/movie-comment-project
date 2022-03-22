@@ -34,7 +34,7 @@ angular.module('app.latestComments', []).directive('appLatestComments', [functio
             }).then(response => {
                 $scope.commentsData[index] = {
                     ...comment,
-                    movieTitle: response.data[0].title,
+                    movieTitle: response.data[0]?.title,
                 };
             }));
         }

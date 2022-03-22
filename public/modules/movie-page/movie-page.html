@@ -1,117 +1,73 @@
 <div ng-controller="MoviePageCtrl">
-    <form ng-submit="loadData()" class="w-100 pb-4">
-        <div class="input-group">
-            <input type="text"
-                   class="form-control"
-                   placeholder="Search by DVD name or client phone number"
-                   aria-label="Search"
-                   ng-model="searchText"
-            >
-
-            <label ng-class="{'btn-dark': mode === 'dvd', 'btn-outline-dark': mode !== 'dvd'}" class="btn">
-                <input ng-model="mode"
-                       type="radio"
-                       class="btn-check"
-                       name="mode"
-                       value="dvd"
-                >
-                DVD
-            </label>
-
-            <label ng-class="{'btn-dark': mode === 'client', 'btn-outline-dark': mode !== 'client'}" class="btn">
-                <input ng-model="mode"
-                       type="radio"
-                       class="btn-check"
-                       name="mode"
-                       value="client"
-                >
-                Client
-            </label>
-
-            <button type="submit" class="btn btn-primary">
-                <svg width="24" height="24" fill="none" stroke="#ffffff" stroke-width="2">
-                    <use href="assets/icons/feather-icons.svg#search"/>
-                </svg>
-            </button>
+    <section class="pt-2 text-center container">
+        <div ng-show="showLoader" class="pv-3">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
         </div>
-    </form>
 
-    <div ng-show="showLoader" class="pv-3">
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
+        <div ng-show="showLoadError" class="pv-3">
+            Error occurred! Please, try to reopen this page.
         </div>
-    </div>
 
-    <div ng-show="showLoadError" class="pv-3">
-        Error occurred! Please, try to reopen this page.
-    </div>
+        <div ng-show="movieData" class="col-lg-6 col-md-8 mx-auto">
+            <h1 class="fw-light">{{ movieData.title }}</h1>
+            <p class="lead text-muted">Director: {{ movieData.director }}</p>
+        </div>
+    </section>
+    <div class="album py-2 bg-light">
+        <div class="container">
+            <div ng-show="showCommentsLoader" class="pv-3">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
 
-    <div ng-show="mode === 'dvd'" class="row row-cols-1 row-cols-md-3 scrollable-container">
-        <div ng-repeat="dvd in dvdData" class="col mb-3">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted">
-                        {{ dvd.type }}, {{ dvd.productionYear }}
-                    </h6>
+            <div ng-show="showCommentsLoadError" class="pv-3">
+                Error occurred! Please, try to reopen this page.
+            </div>
 
-                    <h5 class="card-title">{{ dvd.title }}</h5>
-
-                    <button ng-click="dvd.showRentForm = true"
-                            ng-show="!dvd.rentId && !dvd.showRentForm"
-                            class="btn btn-secondary">
-                        Rent
-                    </button>
-
-                    <div ng-show="!!dvd.showRentForm" class="mv-2">
-                        <form ng-submit="rentDvd(dvd)" name="rentForm{{dvd.id}}" class="w-100 pb-4">
-                            <input type="text"
-                                   class="form-control my-2"
-                                   placeholder="Enter customer phone number"
-                                   name="rentClient"
-                                   ng-model="dvdData[$index].rentClient"
-                                   ng-pattern="/^\+?\d+$/"
-                                   required>
-
-                            <button ng-disabled="rentForm{{dvd.id}}.$invalid"
-                                    type="submit"
-                                    class="btn btn-primary">
-                                Confirm rent
-                            </button>
-                        </form>
+            <div class="px-4">
+                <span ng-show="!!commentsData.length" class="fs-5 fw-semibold">Comments about this film:</span>
+                <div class="mt-3 list-group-item">
+                    <div ng-show="showThankYou">
+                        Thank you for your comment!
                     </div>
-
-                    <div ng-show="!!dvd.rentId">
-                        <h6 class="card-subtitle mb-2 text-muted">
-                            Rented {{ isNull(dvd.offerDt) ?
-                                'on an unknown date' :
-                                ((dvd.offerDt.split(' ')[0] | date) + ' ' + dvd.offerDt.split(' ')[1])
-                            }} by
-                            {{ (isNull(dvd.firstName) || isNull(dvd.lastName)) ?
-                                'unknown customer' : dvd.firstName + ' ' + dvd.lastName }},
-                            {{ isNull(dvd.telNumber) ? 'no phone found' : dvd.telNumber}}
-                        </h6>
-                        <button ng-click="returnDvd(dvd)" class="btn btn-primary">Return</button>
+                    <form ng-show="!showThankYou" name="commentForm" ng-submit="submitForm()" >
+                        <div class="row">
+                            <label class="mb-3 col-4 form-label">
+                                Your name or nickname
+                                <input type="text" class="form-control" ng-model="newComment.author" required>
+                            </label>
+                            <label class="mb-3 col-2 form-label">
+                                Rating
+                                <input type="number" min="0" max="5" class="form-control" ng-model="newComment.rating" required>
+                            </label>
+                            <label class="mb-3 offset-md-4 col-2 form-label">
+                                Language
+                                <input type="text" class="form-control" ng-model="newComment.language" readonly />
+                            </label>
+                        </div>
+                        <div class="row">
+                            <label class="mb-3 col-12 form-label">
+                                Comment
+                                <textarea class="form-control" ng-model="newComment.comment" ></textarea>
+                            </label>
+                        </div>
+                        <button type="submit" class="col-2 offset-md-10 btn btn-primary">Submit</button>
+                    </form>
+                </div>
+                <div class="my-3 list-group">
+                    <div ng-repeat="comment in commentsData" class="list-group-item py-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <strong class="mb-1">{{ comment.author }}</strong>
+                            <small class="text-muted">{{ comment.rating }} stars</small>
+                        </div>
+                        <div class="col-10 mb-1 small">{{ comment.comment }}</div>
+                        <small class="text-muted">{{ comment.date | date: "longDate" }}</small>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div ng-show="mode === 'client'">
-        <div ng-show="!!clientData" class="col card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">{{ clientData.firstName }} {{ clientData.lastName }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">{{ clientData.telNumber }}</h6>
-                <p class="card-text">
-                    <strong>Birthday:</strong> {{ clientData.birthDate | date }}<br/>
-                    <strong>Registration date:</strong>
-                    {{ clientData.registrationDate.split(' ')[0] | date }}
-                    {{ clientData.registrationDate.split(' ')[1] }}
-                </p>
-            </div>
-        </div>
-        <div ng-show="!clientData" class="pv-3">
-            Client not found.
         </div>
     </div>
 </div>
