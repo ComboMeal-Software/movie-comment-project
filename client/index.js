@@ -133,9 +133,7 @@ app.get('/movie', async (req, res) => {
 
                     const renderData = {...responses};
 
-                    res.header('Content-Type', 'text/html');
                     res.render('movie', renderData);
-                    res.end();
                 }
             });
         });
@@ -173,9 +171,7 @@ app.get('/add_movie', async (req, res) => {
 
                     responses.movies = [];
 
-                    res.header('Content-Type', 'text/html');
                     res.render('addMovie', renderData);
-                    res.end();
                 }
             });
         });
