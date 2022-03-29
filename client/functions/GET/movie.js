@@ -2,7 +2,7 @@ const http = require('http');
 
 module.exports = function (app, API) {
     app.get('/movie', async (req, res) => {
-        const urls = [API.latestComments, API.getMovie(req.query.imdbId), API.movieComments, API.getAllMovies];
+        const urls = [API.latestComments, API.getMovie(req.query.imdbId), API.movieComments(req.query.imdbId), API.getAllMovies];
         const responseNames = ["latestComments", "movie", "movieComments", "movies"];
 
         const responses = {};

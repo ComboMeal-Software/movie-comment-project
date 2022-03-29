@@ -23,6 +23,10 @@ require('./functions/GET/movies')(app, API);
 require('./functions/POST/add_comment')(app, API);
 require('./functions/POST/add_movie')(app, API);
 
+/*app.on('error', function (error) {
+
+});*/
+
 const port = 8082;
 
 app.listen(port, () => console.log("Listening on " + port));

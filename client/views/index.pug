@@ -53,7 +53,7 @@ main.row.w-100
                 strong.mb-1= mcomment.author
                 small.text-muted= mcomment.rating + ' stars'
               .col-10.mb-1.small= mcomment.comment
-              small.text-muted= mcomment.date
+              small.text-muted= mcomment.date.substring(0, 10) + ' ' + mcomment.date.substring(11, 19)
   .col-3.d-flex.flex-column.align-items-stretch.flex-shrink-0.bg-white
     span.py-2.fs-5.fw-semibold 3 latest comments:
     #latestContainer.list-group
