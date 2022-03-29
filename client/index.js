@@ -26,14 +26,14 @@ app.set('views', 'views');
 
 app.get('/', async (req, res) => {
     const urls = [API.latestComments, API.getAllMovies];
-    const responseNames = ["latestComments", "getAllMovies"];
-
+    const responseNames = ["latestComments", "movies"];
+    
     if (req.query.imdbId) {
         urls.push(API.movieComments(req.query.imdbId));
         responseNames.push("movieComments");
     }
 
-    const responses = {};
+    let responses = { };
 
     let completed_requests = 0;
 
@@ -45,15 +45,23 @@ app.get('/', async (req, res) => {
 
             response.on('end', function () {
                 if (completed_requests++ === urls.length - 1) {
+
+                    for (let i = 0; i < responses.latestComments.length; i++) {
+                        let movie = responses.movies.find(m => m.imdbId == responses.latestComments[i].imdbId);
+                        if (movie) {
+                            responses.latestComments[i].title = movie.title;
+                        } else {
+                            responses.latestComments[i].title = "Unknown film";
+                        }
+                    }
+
                     const renderData = {...responses};
 
                     if (!renderData.movieComments) {
                         renderData.movieComments = [];
                     }
 
-                    res.header('Content-Type', 'text/html');
                     res.render('index', renderData);
-                    res.end();
                 }
             });
         });
@@ -61,14 +69,8 @@ app.get('/', async (req, res) => {
 });
 
 app.get('/movies', async (req, res) => {
-    const urls = [];
-    const responseNames = ["movies"];
-
-    if (req.query.imdbId) {
-        urls.push(API.getMovie(req.query.imdbId));
-    } else {
-        urls.push(API.getAllMovies);
-    }
+    const urls = [API.latestComments, API.getAllMovies];
+    const responseNames = ["latestComments", "movies"];
 
     const responses = {};
 
@@ -82,11 +84,94 @@ app.get('/movies', async (req, res) => {
 
             response.on('end', function () {
                 if (completed_requests++ === urls.length - 1) {
+                    for (let i = 0; i < responses.latestComments.length; i++) {
+                        console.log();
+                        let movie = responses.movies.find(m => m.imdbId == responses.latestComments[i].imdbId);
+                        if (movie) {
+                            responses.latestComments[i].title = movie.title;
+                        } else {
+                            responses.latestComments[i].title = "Unknown film";
+                        }
+                    }
+
+                    const renderData = {...responses};
+                    
+                    res.render('movies', renderData);
+                }
+            });
+        });
+    });
+});
+
+app.get('/movie', async (req, res) => {
+    const urls = [API.latestComments, API.getMovie(req.query.imdbId), API.movieComments, API.getAllMovies];
+    const responseNames = ["latestComments", "movie", "movieComments", "movies"];
+    
+    const responses = {};
+
+    let completed_requests = 0;
+
+    urls.forEach(function (url, index) {
+        http.get(url, function (response) {
+            response.on('data', function (chunk) {
+                responses[responseNames[index]] = JSON.parse(chunk.toString());
+            });
+
+            response.on('end', function () {
+                if (completed_requests++ === urls.length - 1) {
+                    for (let i = 0; i < responses.latestComments.length; i++) {
+                        console.log();
+                        let movie = responses.movies.find(m => m.imdbId == responses.latestComments[i].imdbId);
+                        if (movie) {
+                            responses.latestComments[i].title = movie.title;
+                        } else {
+                            responses.latestComments[i].title = "Unknown film";
+                        }
+                    }
+
+                    responses.movies = [];
+
                     const renderData = {...responses};
 
-                    res.header('Content-Type', 'text/html');
-                    res.render('movies', renderData);
-                    res.end();
+                    res.render('movie', renderData);
+                }
+            });
+        });
+    });
+});
+
+app.get('/add_movie', async (req, res) => {
+    const urls = [API.latestComments, API.getAllMovies];
+    const responseNames = ["latestComments", "movies"];
+
+    const responses = {};
+
+    let completed_requests = 0;
+
+    urls.forEach(function (url, index) {
+        http.get(url, function (response) {
+            response.on('data', function (chunk) {
+                responses[responseNames[index]] = JSON.parse(chunk.toString());
+            });
+
+            response.on('end', function () {
+                if (completed_requests++ === urls.length - 1) {
+
+                    for (let i = 0; i < responses.latestComments.length; i++) {
+                        console.log();
+                        let movie = responses.movies.find(m => m.imdbId == responses.latestComments[i].imdbId);
+                        if (movie) {
+                            responses.latestComments[i].title = movie.title;
+                        } else {
+                            responses.latestComments[i].title = "Unknown film";
+                        }
+                    }
+
+                    const renderData = {...responses};
+
+                    responses.movies = [];
+
+                    res.render('addMovie', renderData);
                 }
             });
         });
