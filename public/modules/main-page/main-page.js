@@ -6,6 +6,7 @@ angular.module('app.mainPage', []).directive('appMainPage', [function () {
     };
 }]).controller('MainPageCtrl', ['$scope', '$http',
     function ($scope, $http) {
+        // Loader and error message display flags
         $scope.showLoader = false;
         $scope.showLoadError = false;
 
@@ -18,10 +19,13 @@ angular.module('app.mainPage', []).directive('appMainPage', [function () {
                 method: 'GET',
                 url: 'http://localhost:8081/movies',
             }).then(response => {
+                // Populate received data
                 $scope.moviesData = response.data;
             }).catch(() => {
+                // Show error on loading failure
                 $scope.showLoadError = true;
             }).finally(() => {
+                // Hide loader on any result
                 $scope.showLoader = false;
             });
         }
